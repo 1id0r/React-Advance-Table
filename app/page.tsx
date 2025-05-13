@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { ColumnDef, Table } from '@tanstack/react-table'
-import { makeData, Person } from '@/lib/makeData'
+import { Person } from '@/lib/makeData'
 import { isWithinInterval } from 'date-fns'
 import { AdvancedDataTable } from '@/components/data-table'
 import { DataTableCheckBox } from '@/components/data-table/data-table-checkbox'
@@ -11,12 +11,187 @@ import { Button } from '@/components/ui/button'
 import { GitHubLogoIcon } from '@radix-ui/react-icons'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { z } from 'zod'
-import { faker } from '@faker-js/faker'
 
-const data = makeData(100_000)
+// Static dataset to replace faker-generated data
+const staticData: Person[] = [
+  {
+    id: '1',
+    objectName: 'Server A',
+    description: 'Main application server',
+    severity: 'Critical',
+    hierarchy: 'IT Infrastructure',
+    lastUpdated: new Date('2023-11-15'),
+    startDate: new Date('2023-01-05'),
+    status: 'Open',
+    impact: 'High',
+    origin: 'System Monitoring',
+    snId: 'SN-001',
+    environment: 'Production',
+  },
+  {
+    id: '2',
+    objectName: 'Database Cluster',
+    description: 'Primary database cluster',
+    severity: 'Warning',
+    hierarchy: 'Database',
+    lastUpdated: new Date('2023-10-22'),
+    startDate: new Date('2023-02-18'),
+    status: 'In Progress',
+    impact: 'Medium',
+    origin: 'Manual Check',
+    snId: 'SN-002',
+    environment: 'Production',
+  },
+  {
+    id: '3',
+    objectName: 'Load Balancer',
+    description: 'Load balancer for web services',
+    severity: 'Major',
+    hierarchy: 'Network',
+    lastUpdated: new Date('2023-12-01'),
+    startDate: new Date('2023-03-10'),
+    status: 'Resolved',
+    impact: 'Low',
+    origin: 'Alert System',
+    snId: 'SN-003',
+    environment: 'Staging',
+  },
+  {
+    id: '4',
+    objectName: 'User Authentication',
+    description: 'Authentication service issues',
+    severity: 'Critical',
+    hierarchy: 'Security',
+    lastUpdated: new Date('2023-12-10'),
+    startDate: new Date('2023-05-22'),
+    status: 'Open',
+    impact: 'High',
+    origin: 'User Reports',
+    snId: 'SN-004',
+    environment: 'Production',
+  },
+  {
+    id: '5',
+    objectName: 'Backup System',
+    description: 'Daily backup process',
+    severity: 'Warning',
+    hierarchy: 'Data Management',
+    lastUpdated: new Date('2023-11-28'),
+    startDate: new Date('2023-04-15'),
+    status: 'Closed',
+    impact: 'Medium',
+    origin: 'Automated Check',
+    snId: 'SN-005',
+    environment: 'Development',
+  },
+  {
+    id: '6',
+    objectName: 'Test Environment',
+    description: 'QA testing infrastructure',
+    severity: 'Major',
+    hierarchy: 'Testing',
+    lastUpdated: new Date('2023-11-05'),
+    startDate: new Date('2023-06-01'),
+    status: 'In Progress',
+    impact: 'Low',
+    origin: 'QA Team',
+    snId: 'SN-006',
+    environment: 'QA',
+  },
+  {
+    id: '7',
+    objectName: 'Network Switch',
+    description: 'Core network switch',
+    severity: 'Critical',
+    hierarchy: 'Network',
+    lastUpdated: new Date('2023-12-15'),
+    startDate: new Date('2023-07-12'),
+    status: 'Open',
+    impact: 'High',
+    origin: 'Network Monitoring',
+    snId: 'SN-007',
+    environment: 'Production',
+  },
+  {
+    id: '8',
+    objectName: 'API Gateway',
+    description: 'External API gateway service',
+    severity: 'Warning',
+    hierarchy: 'API Services',
+    lastUpdated: new Date('2023-11-12'),
+    startDate: new Date('2023-08-05'),
+    status: 'In Progress',
+    impact: 'Medium',
+    origin: 'System Logs',
+    snId: 'SN-008',
+    environment: 'Staging',
+  },
+  {
+    id: '9',
+    objectName: 'Storage System',
+    description: 'Primary storage array',
+    severity: 'Major',
+    hierarchy: 'Storage',
+    lastUpdated: new Date('2023-10-30'),
+    startDate: new Date('2023-09-18'),
+    status: 'Resolved',
+    impact: 'Low',
+    origin: 'Monitoring Alert',
+    snId: 'SN-009',
+    environment: 'Production',
+  },
+  {
+    id: '10',
+    objectName: 'Logging Service',
+    description: 'Centralized logging system',
+    severity: 'Critical',
+    hierarchy: 'Monitoring',
+    lastUpdated: new Date('2023-12-05'),
+    startDate: new Date('2023-10-01'),
+    status: 'Open',
+    impact: 'High',
+    origin: 'DevOps Team',
+    snId: 'SN-010',
+    environment: 'Development',
+  }
+];
+
+// Example of how to fetch data from an API
+async function fetchTableData(): Promise<Person[]> {
+  // In a real implementation, this would be:
+  // const response = await fetch('https://api.example.com/data');
+  // const data = await response.json();
+  // return data;
+  
+  // For demonstration, we'll use a timeout to simulate network delay
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(staticData);
+    }, 1500);
+  });
+}
+
 export default function Home() {
-  const [isLoading, setLoading] = useState(true)
-  const filename = 'exampleExport'
+  const [isLoading, setLoading] = useState(true);
+  const [data, setData] = useState<Person[]>([]);
+  const filename = 'exampleExport';
+  
+  // Simulate data fetching when component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await fetchTableData();
+        setData(result);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
   const columns = useMemo<ColumnDef<Person>[]>(
     () => [
       {
@@ -62,6 +237,7 @@ export default function Home() {
         header: 'Severity',
         accessorKey: 'severity',
         id: 'severity',
+        enableGrouping: true,
         cell: (info) => {
           const severity = info.getValue() as string;
           let bg = '', color = '#fff';
@@ -93,15 +269,39 @@ export default function Home() {
         header: 'Hierarchy',
         accessorKey: 'hierarchy',
         id: 'hierarchy',
+        enableGrouping: true,
         cell: (info) => info.getValue(),
       },
       {
         header: 'Last Updated',
         accessorKey: 'lastUpdated',
         id: 'lastUpdated',
+        enableGrouping: true,
         cell: (info) => {
-          const date = info.getValue() as Date;
-          return date.toLocaleDateString();
+          const value = info.getValue();
+          if (!value) return "";
+          if (
+            typeof value === "string" ||
+            typeof value === "number" ||
+            value instanceof Date
+          ) {
+            const date = value instanceof Date ? value : new Date(value);
+            return isNaN(date.getTime()) ? "" : date.toLocaleDateString();
+          }
+          return "";
+        },
+        // Custom cell renderer for grouped cells
+        getGroupingValue: (row) => {
+          const value = row.lastUpdated;
+          if (!value) return "";
+          const date = value instanceof Date ? value : new Date(value);
+          if (isNaN(date.getTime())) return "";
+          
+          // Return a formatted string instead of a Date object
+          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        },
+        aggregatedCell: (info) => {
+          return "Multiple dates";
         },
         meta: {
           filterVariant: 'date',
@@ -116,9 +316,32 @@ export default function Home() {
         header: 'Start Date',
         accessorKey: 'startDate',
         id: 'startDate',
+        enableGrouping: true,
         cell: (info) => {
-          const date = info.getValue() as Date;
-          return date.toLocaleDateString();
+          const value = info.getValue();
+          if (!value) return "";
+          if (
+            typeof value === "string" ||
+            typeof value === "number" ||
+            value instanceof Date
+          ) {
+            const date = value instanceof Date ? value : new Date(value);
+            return isNaN(date.getTime()) ? "" : date.toLocaleDateString();
+          }
+          return "";
+        },
+        // Custom cell renderer for grouped cells
+        getGroupingValue: (row) => {
+          const value = row.startDate;
+          if (!value) return "";
+          const date = value instanceof Date ? value : new Date(value);
+          if (isNaN(date.getTime())) return "";
+          
+          // Return a formatted string instead of a Date object
+          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        },
+        aggregatedCell: (info) => {
+          return "Multiple dates";
         },
         meta: {
           filterVariant: 'date',
@@ -133,6 +356,7 @@ export default function Home() {
         header: 'Status',
         accessorKey: 'status',
         id: 'status',
+        enableGrouping: true,
         cell: (info) => info.getValue(),
         meta: {
           filterVariant: 'select',
@@ -148,6 +372,7 @@ export default function Home() {
         header: 'Origin',
         accessorKey: 'origin',
         id: 'origin',
+        enableGrouping: true,
         cell: (info) => info.getValue(),
       },
       {
@@ -160,6 +385,7 @@ export default function Home() {
         header: 'Environment',
         accessorKey: 'environment',
         id: 'environment',
+        enableGrouping: true,
         cell: (info) => info.getValue(),
         meta: {
           filterVariant: 'select',
@@ -168,13 +394,6 @@ export default function Home() {
     ],
     []
   )
-
-  useEffect(() => {
-    const tmo = setTimeout(() => {
-      setLoading(false)
-      clearTimeout(tmo)
-    }, 5000)
-  }, [])
 
   return (
     <>
@@ -210,17 +429,21 @@ export default function Home() {
         }}
         addDataProps={{
           enable: true,
-          title: 'Add a new netizen',
-          description: 'Netizens can be rude sometimes. Add them with caution.',
-          onSubmitNewData: (netizen) => {
-            console.log('onSubmitNewData', netizen)
+          title: 'Add a new item',
+          description: 'Add a new item to the table.',
+          onSubmitNewData: (item) => {
+            console.log('onSubmitNewData', item)
+            // In a real app, you would call your API to add the new item
+            // Then refresh your data
           },
         }}
         editDataProps={{
-          title: 'Amend netizen data',
-          description: 'Netizens can be rude sometimes. Edit them with caution.',
-          onSubmitEditData: (netizen) => {
-            console.log('onSubmitEditData', netizen)
+          title: 'Edit item',
+          description: 'Edit the selected item.',
+          onSubmitEditData: (item) => {
+            console.log('onSubmitEditData', item)
+            // In a real app, you would call your API to update the item
+            // Then refresh your data
           },
         }}
         isLoading={isLoading}

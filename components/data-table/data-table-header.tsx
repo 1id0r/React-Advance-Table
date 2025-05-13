@@ -14,6 +14,7 @@ import {
 	EyeOffIcon,
 	FilterIcon,
 	GripVerticalIcon,
+	GroupIcon,
 	MoveLeftIcon,
 	MoveRightIcon,
 	PinIcon,
@@ -198,6 +199,22 @@ export function DataTableHeader<T>({ header, table }: { header: Header<T, unknow
 						</ContextMenuItem> : null
 					}
 					<ContextMenuSeparator/>
+					{column.getCanGroup() ? (
+						<ContextMenuItem 
+							inset 
+							onClick={() => column.toggleGrouping()}
+						>
+							{column.getIsGrouped() 
+								? "Remove Grouping" 
+								: `Group by ${String(column.columnDef.header || column.id)}`}
+							<ContextMenuShortcut>
+								<GroupIcon className="w-4 h-4" />
+							</ContextMenuShortcut>
+						</ContextMenuItem>
+					) : null}
+					{column.getIsGrouped() ? (
+						<ContextMenuSeparator/>
+					) : null}
 					<ContextMenuItem inset onClick={() => column.toggleVisibility()}>
 						Hide
 						<ContextMenuShortcut>

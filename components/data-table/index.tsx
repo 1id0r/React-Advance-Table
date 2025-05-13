@@ -11,7 +11,10 @@ import {
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
-    VisibilityState
+    VisibilityState,
+    getGroupedRowModel,
+    getExpandedRowModel,
+    GroupingState,
 } from "@tanstack/react-table";
 import {useDataTableStore} from "@/store/dataTableStore";
 import * as React from "react";
@@ -46,6 +49,7 @@ import {IAdvancedDataTable} from "@/interface/IDataTable";
 import {DataTableSkeleton} from "@/components/data-table/data-table-skeleton";
 import {DataTableAddRow} from "@/components/data-table/data-table-add-row";
 import {useVirtualizer} from "@tanstack/react-virtual";
+import {Button} from "@/components/ui/button";
 
 declare module "@tanstack/react-table" {
 	interface ColumnMeta<TData, TValue> {
@@ -85,6 +89,7 @@ export function AdvancedDataTable<T>(props: IAdvancedDataTable<T>) {
     const [internalColumns, setInternalColumns] = useState<ColumnDef<T>[]>([]);
     const [globalFilter, setGlobalFilter] = useState("");
     const [rowSelection, setRowSelection] = useState({});
+    const [grouping, setGrouping] = useState<GroupingState>([]);
 
     useEffect(() => {
         if (isSelecting) {
@@ -113,7 +118,8 @@ export function AdvancedDataTable<T>(props: IAdvancedDataTable<T>) {
             columnVisibility,
             columnPinning,
             globalFilter,
-            rowSelection
+            rowSelection,
+            grouping,
         },
         filterFns: {
             fuzzy: fuzzyFilter
@@ -125,6 +131,7 @@ export function AdvancedDataTable<T>(props: IAdvancedDataTable<T>) {
         onColumnPinningChange: setColumnPinning,
         onColumnOrderChange: setColumnOrder,
         onColumnFiltersChange: setColumnFilters,
+        onGroupingChange: setGrouping,
         columnResizeMode: "onChange",
         columnResizeDirection:"ltr",
         getCoreRowModel: getCoreRowModel(),
@@ -134,6 +141,8 @@ export function AdvancedDataTable<T>(props: IAdvancedDataTable<T>) {
         getFacetedRowModel: getFacetedRowModel(),
         getFacetedUniqueValues: getFacetedUniqueValues(),
         getFacetedMinMaxValues: getFacetedMinMaxValues(),
+        getGroupedRowModel: getGroupedRowModel(),
+        getExpandedRowModel: getExpandedRowModel(),
     });
 
     function onDragEnd(event: DragEndEvent) {
