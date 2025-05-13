@@ -47,85 +47,122 @@ export default function Home() {
         size: 50,
       },
       {
-        header: 'First Name',
-        accessorKey: 'firstName',
-        id: 'firstName',
+        header: 'Object Name',
+        accessorKey: 'objectName',
+        id: 'objectName',
         cell: (info) => info.getValue(),
       },
       {
-        accessorFn: (row) => row.lastName,
-        id: 'lastName',
+        header: 'Description',
+        accessorKey: 'description',
+        id: 'description',
         cell: (info) => info.getValue(),
-        header: 'Last Name',
       },
       {
-        accessorKey: 'gender',
-        id: 'gender',
-        header: 'Gender',
-        meta: {
-          filterVariant: 'select',
-        },
-      },
-      {
-        accessorFn: (row) => row.jobType,
-        id: 'jobType',
-        cell: (info) => info.getValue(),
-        header: 'Job Type',
-      },
-      {
-        accessorFn: (row) => row.address,
-        id: 'address',
-        cell: (info) => info.getValue(),
-        header: 'Address',
-      },
-      {
-        accessorFn: (row) => row.locality,
-        id: 'locality',
-        cell: (info) => info.getValue(),
-        header: 'Locality',
-        meta: {
-          filterVariant: 'select',
-        },
-      },
-      {
-        accessorKey: 'age',
-        id: 'age',
-        header: 'Age',
-        meta: {
-          filterVariant: 'range',
-        },
-      },
-      {
-        accessorKey: 'visits',
-        id: 'visits',
-        header: 'Visits',
-        meta: {
-          filterVariant: 'range',
-        },
-      },
-      {
-        accessorKey: 'status',
-        id: 'status',
-        header: 'Status',
-        meta: {
-          filterVariant: 'select',
-        },
-      },
-      {
-        accessorKey: 'lastUpdate',
-        id: 'lastUpdate',
-        header: 'Last Update',
+        header: 'Severity',
+        accessorKey: 'severity',
+        id: 'severity',
         cell: (info) => {
-          const str = info.getValue() as Date
-          return str.toLocaleDateString()
+          const severity = info.getValue() as string;
+          let bg = '', color = '#fff';
+          if (severity === 'Critical') bg = '#ef4444'; // red
+          else if (severity === 'Warning') bg = '#facc15', color = '#333'; // yellow, dark text for contrast
+          else if (severity === 'Major') bg = '#3b82f6'; // blue
+
+          return (
+            <span style={{
+              display: 'inline-block',
+              borderRadius: '999px',
+              padding: '0.15em 0.1em',
+              background: bg,
+              color,
+              fontWeight: 500,
+              fontSize: '0.95em',
+              minWidth: 70,
+              textAlign: 'center',
+            }}>
+              {severity}
+            </span>
+          );
+        },
+        meta: {
+          filterVariant: 'select',
+        },
+      },
+      {
+        header: 'Hierarchy',
+        accessorKey: 'hierarchy',
+        id: 'hierarchy',
+        cell: (info) => info.getValue(),
+      },
+      {
+        header: 'Last Updated',
+        accessorKey: 'lastUpdated',
+        id: 'lastUpdated',
+        cell: (info) => {
+          const date = info.getValue() as Date;
+          return date.toLocaleDateString();
         },
         meta: {
           filterVariant: 'date',
         },
         filterFn: (row, columnId, filterValue) => {
-          const columnDate = row.getValue(columnId) as Date
-          const { from, to } = filterValue
-          return isWithinInterval(columnDate, { start: from, end: to || from })
+          const columnDate = row.getValue(columnId) as Date;
+          const { from, to } = filterValue;
+          return isWithinInterval(columnDate, { start: from, end: to || from });
+        },
+      },
+      {
+        header: 'Start Date',
+        accessorKey: 'startDate',
+        id: 'startDate',
+        cell: (info) => {
+          const date = info.getValue() as Date;
+          return date.toLocaleDateString();
+        },
+        meta: {
+          filterVariant: 'date',
+        },
+        filterFn: (row, columnId, filterValue) => {
+          const columnDate = row.getValue(columnId) as Date;
+          const { from, to } = filterValue;
+          return isWithinInterval(columnDate, { start: from, end: to || from });
+        },
+      },
+      {
+        header: 'Status',
+        accessorKey: 'status',
+        id: 'status',
+        cell: (info) => info.getValue(),
+        meta: {
+          filterVariant: 'select',
+        },
+      },
+      {
+        header: 'Impact',
+        accessorKey: 'impact',
+        id: 'impact',
+        cell: (info) => info.getValue(),
+      },
+      {
+        header: 'Origin',
+        accessorKey: 'origin',
+        id: 'origin',
+        cell: (info) => info.getValue(),
+      },
+      {
+        header: 'SN ID',
+        accessorKey: 'snId',
+        id: 'snId',
+        cell: (info) => info.getValue(),
+      },
+      {
+        header: 'Environment',
+        accessorKey: 'environment',
+        id: 'environment',
+        cell: (info) => info.getValue(),
+        meta: {
+          filterVariant: 'select',
         },
       },
     ],
@@ -189,83 +226,70 @@ export default function Home() {
         isLoading={isLoading}
         dataValidationProps={[
           {
-            id: 'firstName',
+            id: 'objectName',
             component: 'input',
-            label: 'First Name',
-            schema: z.string().min(3, 'First name must be at least 3 characters'),
+            label: 'Object Name',
+            schema: z.string().min(3, 'Object Name must be at least 3 characters'),
           },
           {
-            id: 'lastName',
+            id: 'description',
             component: 'input',
-            label: 'Last Name',
-            schema: z.string().min(3, 'Last name must be at least 3 characters'),
+            label: 'Description',
+            schema: z.string().min(3, 'Description must be at least 3 characters'),
           },
           {
-            id: 'address',
+            id: 'severity',
+            component: 'select',
+            label: 'Severity',
+            schema: z.enum(['Critical', 'Warning', 'Major']),
+          },
+          {
+            id: 'hierarchy',
             component: 'input',
-            label: 'Address',
-            schema: z.string().min(3, 'Address must be at least 3 characters'),
+            label: 'Hierarchy',
+            schema: z.string().min(2, 'Hierarchy must be at least 2 characters'),
+          },
+          {
+            id: 'lastUpdated',
+            component: 'date',
+            label: 'Last Updated',
+            schema: z.date(),
+          },
+          {
+            id: 'startDate',
+            component: 'date',
+            label: 'Start Date',
+            schema: z.date(),
           },
           {
             id: 'status',
             component: 'select',
-            label: 'Relationship Status',
-            placeholder: 'Your current relationship status?',
-            data: [
-              {
-                value: 'relationship',
-                children: 'relationship',
-              },
-              {
-                value: 'complicated',
-                children: 'complicated',
-              },
-              {
-                value: 'single',
-                children: 'single',
-              },
-            ],
-            schema: z.enum(['relationship', 'complicated', 'single']),
-            componentCssProps: {
-              parent: 'w-full',
-            },
+            label: 'Status',
+            schema: z.enum(['Open', 'Closed', 'In Progress', 'Resolved']),
           },
           {
-            id: 'gender',
-            component: 'radio',
-            label: 'Gender',
-            placeholder: 'There are only 2 genders',
-            data: [
-              {
-                value: 'male',
-                children: 'Male',
-              },
-              {
-                value: 'female',
-                children: 'Female',
-              },
-            ],
-            schema: z.enum(['male', 'female']),
-            componentCssProps: {
-              parent: 'w-full',
-            },
+            id: 'impact',
+            component: 'input',
+            label: 'Impact',
+            schema: z.string().min(3, 'Impact must be at least 3 characters'),
           },
           {
-            id: 'locality',
-            component: 'combobox',
-            label: 'Locality',
-            placeholder: 'Your current location?',
-            data: new Array(120).fill(0).map((_it, _idx) => {
-              const country = faker.location.country()
-              return {
-                value: country,
-                children: country,
-              }
-            }),
-            schema: z.string().min(3, 'You must choose your locality'),
-            componentCssProps: {
-              parent: 'w-full',
-            },
+            id: 'origin',
+            component: 'input',
+            label: 'Origin',
+            schema: z.string().min(2, 'Origin must be at least 2 characters'),
+          },
+          {
+            id: 'snId',
+            component: 'input',
+            label: 'SN ID',
+            schema: z.string().min(3, 'SN ID must be at least 3 characters'),
+          },
+          {
+            id: 'environment',
+            component: 'select',
+            label: 'Environment',
+            schema: z.enum(['Production', 'Staging', 'Development', 'QA']),
           },
         ]}
       />

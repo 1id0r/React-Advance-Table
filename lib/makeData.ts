@@ -1,18 +1,19 @@
 import { faker } from "@faker-js/faker";
 
 export type Person = {
-	firstName: string
-	lastName: string
-	gender: string
-	jobType: string
-	address: string
-	locality: string
-	age: number
-	visits: number
-	lastUpdate: Date
-	status: "relationship" | "complicated" | "single"
-	subRows?: Person[]
-}
+	objectName: string;
+	description: string;
+	severity: 'Critical' | 'Warning' | 'Major';
+	hierarchy: string;
+	lastUpdated: Date;
+	startDate: Date;
+	status: 'Open' | 'Closed' | 'In Progress' | 'Resolved';
+	impact: string;
+	origin: string;
+	snId: string;
+	environment: 'Production' | 'Staging' | 'Development' | 'QA';
+	subRows?: Person[];
+};
 
 const range = (len: number) => {
     const arr: number[] = [];
@@ -23,25 +24,19 @@ const range = (len: number) => {
 };
 
 const newPerson = (): Person => {
-    return {
-        firstName: faker.person.firstName(),
-        lastName: faker.person.lastName(),
-        jobType: faker.person.jobType(),
-		gender: faker.helpers.shuffle<Person["gender"]>([
-			"male",
-			"female"
-		])[0]!,
-        address: faker.location.streetAddress({useFullAddress: true}),
-        locality: faker.location.country(),
-        age: faker.number.int(40),
-        visits: faker.number.int(1000),
-        lastUpdate: faker.date.future(),
-        status: faker.helpers.shuffle<Person["status"]>([
-            "relationship",
-            "complicated",
-            "single",
-        ])[0]!,
-    };
+	return {
+		objectName: faker.commerce.productName(),
+		description: faker.lorem.sentence(),
+		severity: faker.helpers.shuffle<Person['severity']>(['Critical', 'Warning', 'Major'])[0]!,
+		hierarchy: faker.commerce.department(),
+		lastUpdated: faker.date.recent(),
+		startDate: faker.date.past(),
+		status: faker.helpers.shuffle<Person['status']>(['Open', 'Closed', 'In Progress', 'Resolved'])[0]!,
+		impact: faker.company.buzzPhrase(),
+		origin: faker.location.city(),
+		snId: faker.string.alphanumeric(10),
+		environment: faker.helpers.shuffle<Person['environment']>(['Production', 'Staging', 'Development', 'QA'])[0]!,
+	};
 };
 
 export function makeData(...lens: number[]) {
