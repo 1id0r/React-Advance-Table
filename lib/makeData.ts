@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
 
-export type Person = {
+export type Alert = {
 	id?: string;
 	objectName: string;
 	description: string;
@@ -13,7 +13,7 @@ export type Person = {
 	origin: string;
 	snId: string;
 	environment: 'Production' | 'Staging' | 'Development' | 'QA';
-	subRows?: Person[];
+	subRows?: Alert[];
 };
 
 const range = (len: number) => {
@@ -24,28 +24,28 @@ const range = (len: number) => {
     return arr;
 };
 
-const newPerson = (): Person => {
+const newAlert = (): Alert => {
 	return {
 		objectName: faker.commerce.productName(),
 		description: faker.lorem.sentence(),
-		severity: faker.helpers.shuffle<Person['severity']>(['Critical', 'Warning', 'Major'])[0]!,
+		severity: faker.helpers.shuffle<Alert['severity']>(['Critical', 'Warning', 'Major'])[0]!,
 		hierarchy: faker.commerce.department(),
 		lastUpdated: faker.date.recent(),
 		startDate: faker.date.past(),
-		status: faker.helpers.shuffle<Person['status']>(['Open', 'Closed', 'In Progress', 'Resolved'])[0]!,
+		status: faker.helpers.shuffle<Alert['status']>(['Open', 'Closed', 'In Progress', 'Resolved'])[0]!,
 		impact: faker.company.buzzPhrase(),
 		origin: faker.location.city(),
 		snId: faker.string.alphanumeric(10),
-		environment: faker.helpers.shuffle<Person['environment']>(['Production', 'Staging', 'Development', 'QA'])[0]!,
+		environment: faker.helpers.shuffle<Alert['environment']>(['Production', 'Staging', 'Development', 'QA'])[0]!,
 	};
 };
 
 export function makeData(...lens: number[]) {
-    const makeDataLevel = (depth = 0): Person[] => {
+    const makeDataLevel = (depth = 0): Alert[] => {
         const len = lens[depth]!;
-        return range(len).map((d): Person => {
+        return range(len).map((d): Alert => {
             return {
-                ...newPerson(),
+                ...newAlert(),
                 subRows: lens[depth + 1] ? makeDataLevel(depth + 1) : undefined,
             };
         });

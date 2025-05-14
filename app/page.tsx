@@ -3,17 +3,17 @@
 import * as React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { ColumnDef, Table } from '@tanstack/react-table'
-import { Person } from '@/lib/makeData'
+import { Alert } from '@/lib/makeData'
 import { isWithinInterval } from 'date-fns'
 import { AdvancedDataTable } from '@/components/data-table'
 import { DataTableCheckBox } from '@/components/data-table/data-table-checkbox'
 import { Button } from '@/components/ui/button'
 import { GitHubLogoIcon } from '@radix-ui/react-icons'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Alert as AlertUi, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { z } from 'zod'
 
 // Static dataset to replace faker-generated data
-const staticData: Person[] = [
+const staticData: Alert[] = [
   {
     id: '1',
     objectName: 'Server A',
@@ -153,50 +153,50 @@ const staticData: Person[] = [
     origin: 'DevOps Team',
     snId: 'SN-010',
     environment: 'Development',
-  }
-];
+  },
+]
 
 // Example of how to fetch data from an API
-async function fetchTableData(): Promise<Person[]> {
+async function fetchTableData(): Promise<Alert[]> {
   // In a real implementation, this would be:
   // const response = await fetch('https://api.example.com/data');
   // const data = await response.json();
   // return data;
-  
+
   // For demonstration, we'll use a timeout to simulate network delay
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(staticData);
-    }, 1500);
-  });
+      resolve(staticData)
+    }, 1500)
+  })
 }
 
 export default function Home() {
-  const [isLoading, setLoading] = useState(true);
-  const [data, setData] = useState<Person[]>([]);
-  const filename = 'exampleExport';
-  
+  const [isLoading, setLoading] = useState(true)
+  const [data, setData] = useState<Alert[]>([])
+  const filename = 'exampleExport'
+
   // Simulate data fetching when component mounts
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await fetchTableData();
-        setData(result);
-        setLoading(false);
+        const result = await fetchTableData()
+        setData(result)
+        setLoading(false)
       } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false);
+        console.error('Error fetching data:', error)
+        setLoading(false)
       }
-    };
-    
-    fetchData();
-  }, []);
+    }
 
-  const columns = useMemo<ColumnDef<Person>[]>(
+    fetchData()
+  }, [])
+
+  const columns = useMemo<ColumnDef<Alert>[]>(
     () => [
       {
         id: 'select',
-        header: ({ table }: { table: Table<Person> }) => (
+        header: ({ table }: { table: Table<Alert> }) => (
           <div className={'pt-1'}>
             <DataTableCheckBox
               {...{
@@ -239,27 +239,30 @@ export default function Home() {
         id: 'severity',
         enableGrouping: true,
         cell: (info) => {
-          const severity = info.getValue() as string;
-          let bg = '', color = '#fff';
-          if (severity === 'Critical') bg = '#ef4444'; // red
-          else if (severity === 'Warning') bg = '#facc15', color = '#333'; // yellow, dark text for contrast
-          else if (severity === 'Major') bg = '#3b82f6'; // blue
+          const severity = info.getValue() as string
+          let bg = '',
+            color = '#fff'
+          if (severity === 'Critical') bg = '#ef4444' // red
+          else if (severity === 'Warning') (bg = '#facc15'), (color = '#333') // yellow, dark text for contrast
+          else if (severity === 'Major') bg = '#3b82f6' // blue
 
           return (
-            <span style={{
-              display: 'inline-block',
-              borderRadius: '999px',
-              padding: '0.15em 0.1em',
-              background: bg,
-              color,
-              fontWeight: 500,
-              fontSize: '0.95em',
-              minWidth: 70,
-              textAlign: 'center',
-            }}>
+            <span
+              style={{
+                display: 'inline-block',
+                borderRadius: '999px',
+                padding: '0.15em 0.1em',
+                background: bg,
+                color,
+                fontWeight: 500,
+                fontSize: '0.95em',
+                minWidth: 70,
+                textAlign: 'center',
+              }}
+            >
               {severity}
             </span>
-          );
+          )
         },
         meta: {
           filterVariant: 'select',
@@ -278,38 +281,34 @@ export default function Home() {
         id: 'lastUpdated',
         enableGrouping: true,
         cell: (info) => {
-          const value = info.getValue();
-          if (!value) return "";
-          if (
-            typeof value === "string" ||
-            typeof value === "number" ||
-            value instanceof Date
-          ) {
-            const date = value instanceof Date ? value : new Date(value);
-            return isNaN(date.getTime()) ? "" : date.toLocaleDateString();
+          const value = info.getValue()
+          if (!value) return ''
+          if (typeof value === 'string' || typeof value === 'number' || value instanceof Date) {
+            const date = value instanceof Date ? value : new Date(value)
+            return isNaN(date.getTime()) ? '' : date.toLocaleDateString()
           }
-          return "";
+          return ''
         },
         // Custom cell renderer for grouped cells
         getGroupingValue: (row) => {
-          const value = row.lastUpdated;
-          if (!value) return "";
-          const date = value instanceof Date ? value : new Date(value);
-          if (isNaN(date.getTime())) return "";
-          
+          const value = row.lastUpdated
+          if (!value) return ''
+          const date = value instanceof Date ? value : new Date(value)
+          if (isNaN(date.getTime())) return ''
+
           // Return a formatted string instead of a Date object
-          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
         },
         aggregatedCell: (info) => {
-          return "Multiple dates";
+          return 'Multiple dates'
         },
         meta: {
           filterVariant: 'date',
         },
         filterFn: (row, columnId, filterValue) => {
-          const columnDate = row.getValue(columnId) as Date;
-          const { from, to } = filterValue;
-          return isWithinInterval(columnDate, { start: from, end: to || from });
+          const columnDate = row.getValue(columnId) as Date
+          const { from, to } = filterValue
+          return isWithinInterval(columnDate, { start: from, end: to || from })
         },
       },
       {
@@ -318,38 +317,34 @@ export default function Home() {
         id: 'startDate',
         enableGrouping: true,
         cell: (info) => {
-          const value = info.getValue();
-          if (!value) return "";
-          if (
-            typeof value === "string" ||
-            typeof value === "number" ||
-            value instanceof Date
-          ) {
-            const date = value instanceof Date ? value : new Date(value);
-            return isNaN(date.getTime()) ? "" : date.toLocaleDateString();
+          const value = info.getValue()
+          if (!value) return ''
+          if (typeof value === 'string' || typeof value === 'number' || value instanceof Date) {
+            const date = value instanceof Date ? value : new Date(value)
+            return isNaN(date.getTime()) ? '' : date.toLocaleDateString()
           }
-          return "";
+          return ''
         },
         // Custom cell renderer for grouped cells
         getGroupingValue: (row) => {
-          const value = row.startDate;
-          if (!value) return "";
-          const date = value instanceof Date ? value : new Date(value);
-          if (isNaN(date.getTime())) return "";
-          
+          const value = row.startDate
+          if (!value) return ''
+          const date = value instanceof Date ? value : new Date(value)
+          if (isNaN(date.getTime())) return ''
+
           // Return a formatted string instead of a Date object
-          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+          return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
         },
         aggregatedCell: (info) => {
-          return "Multiple dates";
+          return 'Multiple dates'
         },
         meta: {
           filterVariant: 'date',
         },
         filterFn: (row, columnId, filterValue) => {
-          const columnDate = row.getValue(columnId) as Date;
-          const { from, to } = filterValue;
-          return isWithinInterval(columnDate, { start: from, end: to || from });
+          const columnDate = row.getValue(columnId) as Date
+          const { from, to } = filterValue
+          return isWithinInterval(columnDate, { start: from, end: to || from })
         },
       },
       {
@@ -397,10 +392,10 @@ export default function Home() {
 
   return (
     <>
-      <Alert className={'mb-2'}>
+      <AlertUi className={'mb-2'}>
         <AlertTitle>React Advance Table - Using TanStack Table</AlertTitle>
-      </Alert>
-      <AdvancedDataTable<Person>
+      </AlertUi>
+      <AdvancedDataTable<Alert>
         id={'example-advance-table'}
         columns={columns}
         data={data}
